@@ -99,24 +99,41 @@ function ET({value,onChange,style={},placeholder="タップして編集",multili
 /* ══════════════════════════════════════════
    PS (Photo Slot)
 ══════════════════════════════════════════ */
-function PS({img,onChange,label,em,h=140}){
+function PS({img,onChange,label,em,h=140,comment="",onComment}){
   const ref=useRef();
   const read=async f=>{if(!f||!f.type.startsWith("image/"))return;const r=new FileReader();r.onload=async e=>{const compressed=await compressImage(e.target.result);onChange(compressed);};r.readAsDataURL(f);};
   return(
-    <div style={{position:"relative",height:h}}>
-      <input ref={ref} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={e=>read(e.target.files[0])}/>
-      {img?(
-        <div style={{position:"relative",height:"100%"}}>
-          <img src={img} alt={label} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
-          {em&&<div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(0,0,0,.6)",display:"flex",gap:4,padding:4,justifyContent:"center"}}>
-            <button onClick={()=>ref.current.click()} style={MB2("#2563eb")}>変更</button>
-            <button onClick={()=>onChange(null)} style={MB2("#dc2626")}>削除</button>
-          </div>}
-        </div>
-      ):(
-        <div onClick={()=>em&&ref.current.click()} style={{height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",border:em?"2px dashed #94a3b8":"1px solid #e2e8f0",background:em?"#f8fafc":"#f9fafb",cursor:em?"pointer":"default",WebkitTapHighlightColor:"rgba(0,0,0,0)"}}>
-          {em?<><div style={{fontSize:28}}>📷</div><div style={{fontSize:10,color:"#64748b",fontWeight:600,marginTop:4}}>{label}</div><div style={{fontSize:9,color:"#94a3b8"}}>タップして追加</div></>
-            :<div style={{fontSize:10,color:"#cbd5e1"}}>写真なし</div>}
+    <div>
+      <div style={{position:"relative",height:h}}>
+        <input ref={ref} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={e=>read(e.target.files[0])}/>
+        {img?(
+          <div style={{position:"relative",height:"100%"}}>
+            <img src={img} alt={label} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+            {em&&<div className="no-print" style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(0,0,0,.6)",display:"flex",gap:4,padding:4,justifyContent:"center"}}>
+              <button onClick={()=>ref.current.click()} style={MB2("#2563eb")}>変更</button>
+              <button onClick={()=>onChange(null)} style={MB2("#dc2626")}>削除</button>
+            </div>}
+          </div>
+        ):(
+          <div onClick={()=>em&&ref.current.click()} style={{height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",border:em?"2px dashed #94a3b8":"1px solid #e2e8f0",background:em?"#f8fafc":"#f9fafb",cursor:em?"pointer":"default",WebkitTapHighlightColor:"rgba(0,0,0,0)"}}>
+            {em?<><div style={{fontSize:28}}>📷</div><div style={{fontSize:10,color:"#64748b",fontWeight:600,marginTop:4}}>{label}</div><div style={{fontSize:9,color:"#94a3b8"}}>タップして追加</div></>
+              :<div style={{fontSize:10,color:"#cbd5e1"}}>写真なし</div>}
+          </div>
+        )}
+      </div>
+      {/* 写真下コメント欄 */}
+      {onComment!=null&&(
+        <div style={{borderTop:"1px solid #e2e8f0",background:"#fafafa",padding:"3px 6px",minHeight:22}}>
+          {em?(
+            <input
+              value={comment||""}
+              onChange={e=>onComment(e.target.value)}
+              placeholder="時間・コメントを入力"
+              style={{width:"100%",border:"none",background:"transparent",fontSize:10,color:"#374151",outline:"none",fontFamily:"'Noto Sans JP',sans-serif",padding:0,boxSizing:"border-box"}}
+            />
+          ):(
+            <span style={{fontSize:10,color:"#374151",fontFamily:"'Noto Sans JP',sans-serif"}}>{comment||""}</span>
+          )}
         </div>
       )}
     </div>
@@ -405,8 +422,8 @@ function PhotoAlpha({page,onChange,em}){
             ))}
           </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr"}}>
-            <div style={{borderRight:"1px solid #333"}}><PS img={s.beforeImg} onChange={v=>us(s.id,"beforeImg",v)} label="作業前" em={em} h={120}/></div>
-            <div><PS img={s.afterImg} onChange={v=>us(s.id,"afterImg",v)} label="作業後" em={em} h={120}/></div>
+            <div style={{borderRight:"1px solid #333"}}><PS img={s.beforeImg} onChange={v=>us(s.id,"beforeImg",v)} label="作業前" em={em} h={120} comment={s.beforeComment} onComment={v=>us(s.id,"beforeComment",v)}/></div>
+            <div><PS img={s.afterImg} onChange={v=>us(s.id,"afterImg",v)} label="作業後" em={em} h={120} comment={s.afterComment} onComment={v=>us(s.id,"afterComment",v)}/></div>
           </div>
         </div>
       ))}
@@ -439,7 +456,7 @@ function PhotoBeta({page,onChange,em}){
             {["before","after"].map(side=>(
               <div key={side} style={{borderRight:side==="before"?"1px solid #ccc":"none"}}>
                 <div style={{background:"#f3f4f6",textAlign:"center",padding:"3px 0",fontSize:10,fontWeight:600,borderBottom:"1px solid #ccc"}}>{side==="before"?"作業前":"作業後"}</div>
-                <PS img={s[side+"Img"]} onChange={v=>us(s.id,side+"Img",v)} label={side==="before"?"作業前":"作業後"} em={em} h={130}/>
+                <PS img={s[side+"Img"]} onChange={v=>us(s.id,side+"Img",v)} label={side==="before"?"作業前":"作業後"} em={em} h={130} comment={s[side+"Comment"]} onComment={v=>us(s.id,side+"Comment",v)}/>
               </div>
             ))}
           </div>
@@ -464,12 +481,12 @@ function PhotoGamma({page,onChange,em}){
               <ET value={r.leftLabel} onChange={v=>ur(r.id,"leftLabel",v)} style={{fontSize:10,fontWeight:600}} em={em} placeholder="ラベル"/>
               {em&&<button onClick={()=>onChange({...page,rows:rows.filter(x=>x.id!==r.id)})} style={{background:"#fee2e2",color:"#dc2626",border:"none",borderRadius:2,padding:"1px 4px",fontSize:8,cursor:"pointer"}}>削除</button>}
             </div>
-            <PS img={r.leftImg} onChange={v=>ur(r.id,"leftImg",v)} label={r.leftLabel||"左"} em={em} h={130}/>
+            <PS img={r.leftImg} onChange={v=>ur(r.id,"leftImg",v)} label={r.leftLabel||"左"} em={em} h={130} comment={r.leftComment} onComment={v=>ur(r.id,"leftComment",v)}/>
           </div>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>→</div>
           <div>
             <div style={{fontSize:10,fontWeight:600,marginBottom:2}}><ET value={r.rightLabel} onChange={v=>ur(r.id,"rightLabel",v)} style={{fontSize:10,fontWeight:600}} em={em} placeholder="ラベル"/></div>
-            <PS img={r.rightImg} onChange={v=>ur(r.id,"rightImg",v)} label={r.rightLabel||"右"} em={em} h={130}/>
+            <PS img={r.rightImg} onChange={v=>ur(r.id,"rightImg",v)} label={r.rightLabel||"右"} em={em} h={130} comment={r.rightComment} onComment={v=>ur(r.id,"rightComment",v)}/>
           </div>
         </div>
       ))}
@@ -491,12 +508,12 @@ function PhotoDelta({page,onChange,em}){
             <div style={{background:"#f3f4f6",textAlign:"center",padding:"3px 0",fontSize:10,fontWeight:600,borderBottom:"1px solid #ccc",display:"flex",alignItems:"center",justifyContent:"space-between",paddingLeft:6,paddingRight:6}}>
               <span>施工前</span>{em&&<button onClick={()=>onChange({...page,rows:rows.filter(x=>x.id!==r.id)})} style={{background:"#fee2e2",color:"#dc2626",border:"none",borderRadius:2,padding:"0 4px",fontSize:9,cursor:"pointer"}}>削除</button>}
             </div>
-            <PS img={r.beforeImg} onChange={v=>ur(r.id,"beforeImg",v)} label="施工前" em={em} h={130}/>
+            <PS img={r.beforeImg} onChange={v=>ur(r.id,"beforeImg",v)} label="施工前" em={em} h={130} comment={r.beforeComment} onComment={v=>ur(r.id,"beforeComment",v)}/>
           </div>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,background:"#f9fafb",borderLeft:"1px solid #ccc",borderRight:"1px solid #ccc"}}>→</div>
           <div>
             <div style={{background:"#f3f4f6",textAlign:"center",padding:"3px 0",fontSize:10,fontWeight:600,borderBottom:"1px solid #ccc"}}>施工後</div>
-            <PS img={r.afterImg} onChange={v=>ur(r.id,"afterImg",v)} label="施工後" em={em} h={130}/>
+            <PS img={r.afterImg} onChange={v=>ur(r.id,"afterImg",v)} label="施工後" em={em} h={130} comment={r.afterComment} onComment={v=>ur(r.id,"afterComment",v)}/>
           </div>
         </div>
       ))}
@@ -528,7 +545,7 @@ function PhotoEpsilon({page,onChange,em}){
             {["img1","img2","img3"].map((k,i)=>(
               <div key={k} style={{borderRight:i<2?"1px solid #ccc":"none"}}>
                 <div style={{background:"#f3f4f6",textAlign:"center",padding:"2px 0",fontSize:9,fontWeight:600,borderBottom:"1px solid #ccc"}}>{["作業前","作業中","作業後"][i]}</div>
-                <PS img={s[k]} onChange={v=>us(s.id,k,v)} label={["作業前","作業中","作業後"][i]} em={em} h={100}/>
+                <PS img={s[k]} onChange={v=>us(s.id,k,v)} label={["作業前","作業中","作業後"][i]} em={em} h={100} comment={s[k+"Comment"]} onComment={v=>us(s.id,k+"Comment",v)}/>
               </div>
             ))}
           </div>
@@ -538,7 +555,11 @@ function PhotoEpsilon({page,onChange,em}){
       <div>
         <div style={{fontSize:10,fontWeight:600,marginBottom:6}}><ET value={page.extraLabel} onChange={u("extraLabel")} style={{fontSize:10,fontWeight:600}} em={em} placeholder="その他"/></div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-          {ext.map((img,i)=><PS key={i} img={img} onChange={v=>ue(i,v)} label={`その他${i+1}`} em={em} h={100}/>)}
+          {ext.map((img,i)=>{
+            const extCom=page.extraComments||[];
+            const uec=(idx,v)=>{const a=[...extCom];a[idx]=v;onChange({...page,extraComments:a});};
+            return <PS key={i} img={img} onChange={v=>ue(i,v)} label={`その他${i+1}`} em={em} h={100} comment={extCom[i]||""} onComment={v=>uec(i,v)}/>;
+          })}
         </div>
       </div>
     </div>
@@ -567,12 +588,12 @@ function PhotoZeta({page,onChange,em}){
             <div style={{padding:"2px 0",textAlign:"center",fontSize:10,fontWeight:600,background:"#f3f4f6"}}>作業後</div>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",borderBottom:"1px solid #bbb"}}>
-            <div style={{borderRight:"1px solid #bbb"}}><PS img={s.img1} onChange={v=>us(s.id,"img1",v)} label="作業前①" em={em} h={120}/></div>
-            <div><PS img={s.img2} onChange={v=>us(s.id,"img2",v)} label="作業後①" em={em} h={120}/></div>
+            <div style={{borderRight:"1px solid #bbb"}}><PS img={s.img1} onChange={v=>us(s.id,"img1",v)} label="作業前①" em={em} h={120} comment={s.img1Comment} onComment={v=>us(s.id,"img1Comment",v)}/></div>
+            <div><PS img={s.img2} onChange={v=>us(s.id,"img2",v)} label="作業後①" em={em} h={120} comment={s.img2Comment} onComment={v=>us(s.id,"img2Comment",v)}/></div>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr"}}>
-            <div style={{borderRight:"1px solid #bbb"}}><PS img={s.img3} onChange={v=>us(s.id,"img3",v)} label="作業前②" em={em} h={120}/></div>
-            <div><PS img={s.img4} onChange={v=>us(s.id,"img4",v)} label="作業後②" em={em} h={120}/></div>
+            <div style={{borderRight:"1px solid #bbb"}}><PS img={s.img3} onChange={v=>us(s.id,"img3",v)} label="作業前②" em={em} h={120} comment={s.img3Comment} onComment={v=>us(s.id,"img3Comment",v)}/></div>
+            <div><PS img={s.img4} onChange={v=>us(s.id,"img4",v)} label="作業後②" em={em} h={120} comment={s.img4Comment} onComment={v=>us(s.id,"img4Comment",v)}/></div>
           </div>
         </div>
       ))}
