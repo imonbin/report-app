@@ -23,6 +23,10 @@ cp .env.example .env.local
 npm run dev
 ```
 
+## iPhone用シンプル版
+
+`ios/NittoReportLite/` にネイティブiOS（SwiftUI）版のシンプル版アプリがあります。報告書の種類を「縦」「横」の2種類に絞り、表紙・写真ページと保存機能（Supabase）のみに絞ったものです。セットアップ手順は `ios/NittoReportLite/README.md` を参照してください。
+
 ## ファイル構成
 
 ```
