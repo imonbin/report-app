@@ -10,9 +10,22 @@ Web版（`作業完了報告書管理システム`）のシンプル版として
 
 ## 必要なもの
 
-- macOS + Xcode 15以上
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen)（`.xcodeproj` をこのフォルダの `project.yml` から生成します）
+- macOS + Xcode（お使いのmacOSのバージョンに合ったもの。下記「macOSのバージョンとXcodeの対応」を参照）
 - Supabaseアカウント（Web版と同じプロジェクトでOK）
+
+`NittoReportLite.xcodeproj` は既にこのフォルダに含まれているので、XcodeGenなどの追加ツールは不要です。ダブルクリックで開けます。
+
+### macOSのバージョンとXcodeの対応
+
+最新のXcodeは新しいmacOSでないとインストールできません。お使いのMacのmacOSバージョンに応じて、対応するXcodeを使ってください。
+
+| macOSのバージョン | 使えるXcode |
+|---|---|
+| macOS 14 Sonoma 以降 | 最新のXcode（App Storeから） |
+| macOS 13 Ventura | Xcode 15.0〜15.2程度 |
+| macOS 12 Monterey | **Xcode 14.2**（App Storeでは入らないことがあるので、下記からダウンロード） |
+
+macOS 12の場合は、App Storeではなく [Apple Developer の Downloads ページ](https://developer.apple.com/download/all/)（無料のApple IDでログイン可）から「Xcode 14.2」を検索して`.xip`ファイルをダウンロード → ダブルクリックで展開 → できた`Xcode.app`を`アプリケーション`フォルダに移動、という手順でインストールしてください。
 
 ## セットアップ手順
 
@@ -23,14 +36,9 @@ Web版（`作業完了報告書管理システム`）のシンプル版として
 3. Web版の `reports` / `drawings` テーブルとは別の `simple_reports` テーブルが追加されます（Web版のデータには影響しません）
 4. Project Settings → API から **Project URL** と **anon public キー** を控える
 
-### 2. Xcodeプロジェクトを生成
+### 2. プロジェクトを開く
 
-```bash
-brew install xcodegen
-cd ios/NittoReportLite
-xcodegen generate
-open NittoReportLite.xcodeproj
-```
+`ios/NittoReportLite/NittoReportLite.xcodeproj` をダブルクリックして開くだけです（XcodeGenのインストールやコマンド実行は不要）。
 
 ### 3. 設定を書き込む
 
